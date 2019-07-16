@@ -1,0 +1,152 @@
+﻿@{
+    ViewBag.Title = "Manage Patient";
+
+
+    //  if Session(["nurseID" == null])
+    //{
+    //  Response.Redirect("~/Login/Index");
+    //  }
+
+}
+
+<div>
+
+
+</div>
+
+
+<h2 id="managePatientHeader">Manage Patient List</h2>
+<a class="btn btn-primary" style="margin-bottom:10px" onclick="PopupForm('@Url.Action("AddEditPatient","Patient")')"><i class="material-icons">person_add</i>Register Patient</a>
+<a class="btn btn-primary" style="margin-bottom:10px" onclick="location.href='@Url.Action("DisplayPatient", "Medical")'"><i class="material-icons">person_add</i>Add HPE Record</a>
+
+<!--(a)patient datatable-->
+<table id="patientTable" class="table table-striped table-bordered" style="width:100%">
+
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>State</th>
+            <th>Address</th>
+            <th>Phone Number</th>
+            <th>Age</th>
+            <th>Email</th>
+            <th></th>
+        </tr>
+    </thead>
+</table>
+
+<!--applying js and css into datatable-->
+
+<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet" />
+<link href="~/DataTable/datatables.min.css" rel="stylesheet" />
+
+@section scripts{
+    <script src="~/DataTable/datatables.min.js"></script>
+
+    <script>
+
+        //declare function for add new patient popup
+        var Popup, dataTable;
+
+       $(document).ready(function () {
+            dataTable = $("#patientTable").DataTable({  //(a)call patienttable funtion
+                "ajax": {                  //parse configuration setting for the table
+                    "url": "/Patient/GetPatient", // (c)calling function getpatient from patientcontroller
+                    "type": "GET",
+                    "datatype": "json",
+                        },
+                "columns": [
+                    { "data": "Name" },
+                    { "data": "State" },
+                    { "data": "Address" },
+                    { "data": "PhoneNumber" },
+                    { "data": "Age" },
+                    { "data": "Email" },
+                    { "data": "PatientID", "render": function (data) {
+                           return "<a class='btn btn-primary btn-sm' onclick=PopupForm('@Url.Action("AddEditPatient","Patient")/" + data + "')><i class='fa fa-pencil'></i> Edit</a><a class='btn btn-danger btn-sm' style='margin-left:5px' onclick=Delete("+data+")><i class='fa fa-trash'></i> Delete</a>";
+                    },
+
+                        "orderable": false,
+                        "searchable": false,
+                        "width":"150px"
+                    }
+                    //data are binded to html table
+                ],
+                //add property language
+                "language": {
+                    "emptyTable": "No data is found. Please click on <b>Add Patient</b> button"
+                }
+
+            });
+
+        });
+
+        function PopupForm(url) {
+            var formDiv = $('<div/>');
+            $.get(url)
+                .done(function (response) {
+                    formDiv.html(response);
+
+                    Popup = formDiv.dialog({
+
+                        autoOpen: true,
+                        resizeable: false,
+                        title: 'Fill Patient Details',
+                        height: 500,
+                        width: 700,
+                        close: function () {
+                            Popup.dialog('destroy').remove();
+                        }
+                    });
+                });
+        }
+
+        function SubmitForm(form) {
+            $.validator.unobtrusive.parse(form);
+            if ($(form).valid()) {
+                $.ajax({
+                    type: "POST",
+                    url: form.action,
+                    data: $(form).serialize(),
+                    success: function (data) {
+                        if (data.success) {
+                            Popup.dialog('close');
+                            dataTable.ajax.reload();
+
+                            $.notify(data.message, {
+                                globalPosition: "top center",
+                                className: "success"
+                            })
+
+                        }
+                    }
+                });
+            }
+            return false;
+        }
+
+        function Delete(id) {
+            if (confirm("Are You Sure to Delete this Patient?"))
+            {
+                $.ajax({
+                    type: "POST",
+                    url: '@Url.Action("Delete","Patient")/' + id,
+                    success: function (data) {
+
+                        if (data.success) {
+
+                            dataTable.ajax.reload();
+
+                            $.notify(data.message, {
+                                globalPosition: "top center",
+                                className: "success"
+                            })
+                        }
+                    }
+                })
+            }
+        }
+
+    </script>
+
+}

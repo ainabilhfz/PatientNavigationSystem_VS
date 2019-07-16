@@ -1,0 +1,73 @@
+﻿@model IEnumerable<MVCpatientnavigation.Models.Patient>
+
+@{
+    ViewBag.Title = "DisplayPatient";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>DisplayPatient</title>
+
+</head>
+<body>
+    <p>
+        <h5>
+            Back to
+            <a class="" style="margin-bottom:10px" onclick="location.href='@Url.Action("PatientView", "Patient")'">Home</a>
+        </h5>
+
+    </p>
+    <table class="table">
+        <tr>
+            <th>
+
+                @Html.DisplayNameFor(model => model.PatientID)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model.PhoneNumber)
+            </th>
+
+
+            <th></th>
+        </tr>
+
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+
+                    @Html.DisplayFor(modelItem => item.PatientID)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Name)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.PhoneNumber)
+                </td>
+
+
+                <td>
+                    <a class="btn btn-outline-secondary" style="margin-bottom:10px" onclick="location.href='@Url.Action("AddHPERecord", "Medical")'"><i class="material-icons">person_add</i>Add HPE Record</a>
+
+                    @**Html.ActionLink("Edit", "Edit", new { id = item.PatientID }) |
+                        @Html.ActionLink("Details", "Details", new { id = item.PatientID }) |
+                        @Html.ActionLink("Delete", "Delete", new { id = item.PatientID })*@
+                </td>
+            </tr>
+        }
+
+    </table>
+</body>
+</html>
+
